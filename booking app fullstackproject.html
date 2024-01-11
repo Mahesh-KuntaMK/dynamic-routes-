@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>document</title>
+   
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
+        <link defer href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+
+    </head>
+    <style>
+        fieldset{
+             margin-bottom: 20px;
+             border-color: bisque;
+        }
+    </style>
+           <body >
+            <div class="container";> 
+             
+                 <form id="form" onsubmit="register(event)" >
+                     <fieldset class="field" style="border:1px;">
+                        <h1 style="color: orange;text-align: center;">Book A Call</h1>
+
+                        <p style ="text-align: center;">Fill the Form <p>
+                            <hr>
+
+                      <label class="form-label" for="name">Name:</label>
+                      <input class="form-control" required type="text" id="name" name="username">
+                      <label class="form-label" for="email">EMail:</label>
+                      <input class="form-control" required type="text" id="email" name="email">
+                      <label class="form-label" for="number">Phone Number</label>
+                      <input class="form-control" required type="phone" id="number" name="number">
+                      <label class="form-label" for="date">Date:</label>
+                      <input class="form-control" required type="date" id="date" name="date">
+                      <label class="form-label" for="time">Time:</label>
+                      <input class="form-control" required type="time" id="time" name="time"><br><br>
+                     
+                      <input type="submit" style="width: 100%;background-color:lightgreen; color:white" value="Click on to submit">
+                      </fieldset>
+                     
+
+                 </form>
+               
+             
+            </div>
+            <ul id="listofitems">
+                        
+            </ul>
+          
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
+            <script>
+              
+    
+              function register(event){
+                event.preventDefault();
+                const name=event.target.name.value;
+                const email=event.target.email.value;
+                const number=event.target.number.value;
+                const date=event.target.date.value;
+                const time=event.target.time.value;
+                console.log(name,email,number,date,time)
+                
+                let userData={
+                    Name:name,
+                    Email:email,
+                    Number:number,
+                    Date:date,
+                    Time:time
+
+                }
+                axios.post("http://localhost:5000/admin/products/addUser",userData)
+                .then((res)=>{
+                    console.log(res.data,"hello");
+                  showUserDataONsaScreen(res.data)
+            })
+                .catch(err=>console.log(err))
+                document.getElementById('form').reset();
+
+            }
+
+
+            
+        window.addEventListener('DOMContentLoaded',()=>{
+            axios.get('http://localhost:5000/admin/products/getUser')
+               .then(res=>{
+                console.log(res)
+                for(let i=0;i<res.data.length;i++){
+                    showUserDataONsaScreen(res.data[i])
+                }         
+               })
+               
+               .catch(err=>console.log(err))
+            });
+    
+
+    function  showUserDataONsaScreen(userData){
+         
+            console.log(userData.id);
+
+            console.log(userData);
+           let newuserdata={...userData};
+            let parentNode=document.getElementById('listofitems');
+            let childHTML= `<li id=${userData.id}>${userData.Name} --- ${userData.Email} --- ${userData.Number} --- ${userData.Date} --- ${userData.Time}  
+                   <button onclick=deteleUser(${userData.id})>Delete</button><button onclick=editUser('${userData.Name}','${userData.Email}','${userData.Number}','${userData.Date}','${userData.Time}','${userData.id}')>Edit</button>`
+            parentNode.innerHTML=parentNode.innerHTML+childHTML;
+        }
+        
+    function deteleUser(id){
+        console.log('hello')
+            
+        removeFromScreen(id)
+        console.log(id,"delete")
+        axios.get(`http://localhost:5000/admin/products/addUser/${id}`)
+        .then(product=>{
+           console.log('delete')
+        })
+        .catch(err=>console.log(err))
+
+    }
+
+    function editUser(name,email,number,date,time,id){
+        
+        console.log(id,'edit')
+        document.getElementById('email').value=email;
+        document.getElementById('name').value=name;
+        document.getElementById('number').value=number;   
+        document.getElementById('date').value=date;
+        document.getElementById('time').value=time
+        removeFromScreen(id);
+        axios.get(`http://localhost:5000/admin/products/addUser/${id}`)
+       .then(res=>{
+        console.log(res)
+       })
+       .catch(res=>{
+        console.log(res)
+       })
+    }
+    function removeFromScreen(id){
+        console.log(id,'removed');
+        let parentnode=document.getElementById('listofitems');
+        let nodetobdeleted=document.getElementById(`${id}`);
+        if(nodetobdeleted){
+        parentnode.removeChild(nodetobdeleted);
+        }
+    }
+              
+             
+                
+     </script>
+    
+           </body>
+   
+
+</html>
