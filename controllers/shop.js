@@ -1,41 +1,45 @@
 const Product = require('../models/product');
-const Cart=require('../models/cart');
+
 
 
 exports.getProducts = (req, res, next) => {
-  Product.fetchAll()
-  .then(([rows])=>{
+  Product.findAll()
+  .then(products=>{
     res.render('shop/product-list', {
-      prods:rows,
+      prods:products,
       pageTitle: 'All Products',
       path: '/products'
     });
   })
+  .catch(err=>console.log(err))
 };
 exports.getProduct=(req,res,next)=>{
   const prodId=req.params.productId;
-  Product.findById(prodId)
-  .then(([rows])=>{
-    res.render('shop/product-detail',{
-      product:rows[0],
-      pageTitle:rows[0].title,
-      path:'/products'
-})
-  })
-.catch(err=>console.log('err'))
  
+   Product.findAll({where:{id:prodId}})
+   .then(product=>{
+    res.render('shop/product-detail',{
+      product:product[0],
+      pageTitle:product[0].title,
+      path:'/products'
+    })
+   })  
+
+  .catch(err=>console.log(err))
+
 }
 
 exports.getIndex = (req, res, next) => {
-  Product.fetchAll()
-  .then(([result,fileData])=>{
+
+  Product.findAll()
+  .then(products=>{
+    console.log(products);
     res.render('shop/index', {
-      prods: result,
+      prods: products,
       pageTitle: 'Shop',
       path: '/'
   })
-  })
-  .catch(err=>console.log('err'));
+  }).catch(err=>console.log(err))
   
 }
 
@@ -93,3 +97,8 @@ exports.getCheckout = (req, res, next) => {
     pageTitle: 'Checkout'
   });
 };
+
+exports.adduser=(req,res,next)=>{
+    //console.log(req.body.username,req.body.email)
+    console.log("useradded");
+}
